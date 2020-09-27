@@ -50,5 +50,8 @@ func areEqualJSON(s1, s2 string) (bool, error) {
 		return false, fmt.Errorf("Error mashalling string 2 :: %s", err.Error())
 	}
 
+	fmt.Println(o1)
+	fmt.Println(o2)
+
 	return reflect.DeepEqual(o1, o2), nil
 }

@@ -15,23 +15,15 @@ import (
 )
 
 //tests
-var createCarsCases = []TestCase{
-	{
-		Name: "create car ok case",
-		request: testRequest{method: "POST", jsonBody: `{
-  "data" : {
-  	"type" : "cars" , 
-     "attributes": {
-     	"vendor":"1",
-     	"model" : "1",
-     	"status": "in transit"
-     }
-    }
-}`},
-		response: &httptest.ResponseRecorder{Code: http.StatusCreated,
+func TestCarsHandler_ReadCars(t *testing.T) {
+	var readCarsCases = []TestCase{
+		{
+			Name:    "read all cars ok case",
+			request: testRequest{method: "GET", jsonBody: ``},
+			response: &httptest.ResponseRecorder{Code: http.StatusOK,
 
-			Body: bytes.NewBuffer([]byte(`{
-    "data": 
+				Body: bytes.NewBuffer([]byte(`{
+    "data": [
         {
             "type": "cars",
             "id": "",
@@ -42,17 +34,15 @@ var createCarsCases = []TestCase{
                 "status": "in transit",
                 "mileage": 0
             }
-        },
+        }],
     "meta": {
         "author": "artem savarin",
         "license": "MIT",
         "license-url": "https://opensource.org/licenses/MIT"
     }
 }`))},
-	},
-}
-
-func TestCarsHandler_CreateCar(t *testing.T) {
+		},
+	}
 
 	ctrl := gomock.NewController(t)
 	mockRepo := storage.NewMockStorage(ctrl)
@@ -76,8 +66,14 @@ func TestCarsHandler_CreateCar(t *testing.T) {
 	}
 
 	mockRepo.EXPECT().Insert(car).Return(car.ID, nil)
+	mockRepo.EXPECT().GetAll().Return([]*model.Car{car}, nil)
 
+	//insert before read
 	for _, testCase := range createCarsCases {
+		client.Do(testCase.request)
+	}
+
+	for _, testCase := range readCarsCases {
 		response, err := client.Do(testCase.request)
 		assert.Nil(t, err, "error must be nil")
 		assert.Equal(t, testCase.response.Code, response.Code)
