@@ -15,7 +15,7 @@ import (
 )
 
 //tests
-func TestCarsHandler_ReadCars(t *testing.T) {
+func TestCarsHandler_ReadAllCars(t *testing.T) {
 	var readCarsCases = []TestCase{
 		{
 			Name:    "read all cars ok case",
