@@ -7,13 +7,10 @@ import (
 	"sync"
 )
 
-
-
 type storage struct {
 	syn  sync.RWMutex
 	cars map[string]*model.Car
 }
-
 
 func NewStorage() *storage {
 	return &storage{cars: make(map[string]*model.Car)}

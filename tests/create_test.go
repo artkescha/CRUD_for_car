@@ -1,9 +1,7 @@
-package main
+package tests
 
 import (
 	"bytes"
-	"encoding/json"
-	"fmt"
 	"github.com/artkescha/CRUD_for_car/model"
 	"github.com/artkescha/CRUD_for_car/model/status"
 	"github.com/artkescha/CRUD_for_car/resource"
@@ -13,56 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
-	"strings"
 	"testing"
 )
 
-type testClient struct {
-	baseURL string
-	api     *api2go.API
-}
-
-func (c testClient) CreateCar(req testRequest) (*httptest.ResponseRecorder, error) {
-	request, err := http.NewRequest(req.method, c.baseURL, strings.NewReader(req.jsonBody))
-	if err != nil {
-		return &httptest.ResponseRecorder{}, err
-	}
-	response := httptest.NewRecorder()
-	c.api.Handler().ServeHTTP(response, request)
-	return response, err
-}
-
-type testRequest struct {
-	method   string
-	jsonBody string
-}
-
-func areEqualJSON(s1, s2 string) (bool, error) {
-	var o1 interface{}
-	var o2 interface{}
-
-	var err error
-	err = json.Unmarshal([]byte(s1), &o1)
-	if err != nil {
-		return false, fmt.Errorf("Error mashalling string 1 :: %s", err.Error())
-	}
-	err = json.Unmarshal([]byte(s2), &o2)
-	if err != nil {
-		return false, fmt.Errorf("Error mashalling string 2 :: %s", err.Error())
-	}
-	fmt.Println(o1)
-	fmt.Println(o2)
-	return reflect.DeepEqual(o1, o2), nil
-}
-
 //tests
-type TestCase struct {
-	Name     string
-	request  testRequest
-	response *httptest.ResponseRecorder
-}
-
 func TestCarsHandler_CreateCar(t *testing.T) {
 	var createCarCases = []TestCase{
 		{
@@ -122,10 +74,10 @@ func TestCarsHandler_CreateCar(t *testing.T) {
 		Mileage: 0,
 	}
 
-	for _, testCase := range createCarCases {
-		mockRepo.EXPECT().Insert(car).Return(car.ID, nil)
+	mockRepo.EXPECT().Insert(car).Return(car.ID, nil)
 
-		response, err := client.CreateCar(testCase.request)
+	for _, testCase := range createCarCases {
+		response, err := client.Do(testCase.request)
 		assert.Nil(t, err, "error must be nil")
 		assert.Equal(t, testCase.response.Code, response.Code)
 		isEqual, err := areEqualJSON(testCase.response.Body.String(), response.Body.String())
