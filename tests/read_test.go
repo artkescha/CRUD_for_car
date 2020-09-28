@@ -75,6 +75,7 @@ func TestCarsHandler_ReadAllCars(t *testing.T) {
 
 	for _, testCase := range readCarsCases {
 		response, err := client.Do(testCase.request)
+
 		assert.Nil(t, err, "error must be nil")
 		assert.Equal(t, testCase.response.Code, response.Code)
 		isEqual, err := areEqualJSON(testCase.response.Body.String(), response.Body.String())

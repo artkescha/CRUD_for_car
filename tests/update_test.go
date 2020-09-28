@@ -18,7 +18,7 @@ import (
 func TestCarsHandler_UpdateCar(t *testing.T) {
 	var readCarsCases = []TestCase{
 		{
-			Name:    "update car ok case",
+			Name: "update car ok case",
 			request: testRequest{method: http.MethodPatch, jsonBody: `{
     "data":
         {
@@ -84,7 +84,7 @@ func TestCarsHandler_UpdateCar(t *testing.T) {
 	}
 
 	mockRepo.EXPECT().Insert(car).Return(car.ID, nil)
-	mockRepo.EXPECT().GetOne("0").Return( *car, nil)
+	mockRepo.EXPECT().GetOne("0").Return(*car, nil)
 
 	//insert before read
 	for _, testCase := range createCarsCases {
@@ -95,5 +95,5 @@ func TestCarsHandler_UpdateCar(t *testing.T) {
 		response, err := client.Do(testCase.request)
 		assert.Nil(t, err, "error must be nil")
 		assert.Equal(t, testCase.response.Code, response.Code)
-		}
+	}
 }

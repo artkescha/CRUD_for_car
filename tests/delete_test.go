@@ -55,7 +55,6 @@ func TestCarsHandler_DeleteCar(t *testing.T) {
 	}
 
 	for _, testCase := range deleteCarsCases {
-
 		mockRepo.EXPECT().Delete("0").Return(testCase.err)
 
 		response, err := client.Do(testCase.request)
