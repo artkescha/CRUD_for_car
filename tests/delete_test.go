@@ -15,32 +15,14 @@ import (
 )
 
 //tests
-func TestCarsHandler_ReadAllCars(t *testing.T) {
-	var readCarsCases = []TestCase{
+func TestCarsHandler_DeleteCar(t *testing.T) {
+	var deleteCarsCases = []TestCase{
 		{
-			Name:    "read all cars ok case",
-			request: testRequest{method: http.MethodGet, jsonBody: ``},
-			response: &httptest.ResponseRecorder{Code: http.StatusOK,
+			Name:    "delete car ok case",
+			request: testRequest{method: http.MethodDelete, jsonBody: ``},
+			response: &httptest.ResponseRecorder{Code: http.StatusNoContent,
 
-				Body: bytes.NewBuffer([]byte(`{
-    "data": [
-        {
-            "type": "cars",
-            "id": "",
-            "attributes": {
-                "model": "1",
-                "vendor": "1",
-                "price": 0,
-                "status": "in transit",
-                "mileage": 0
-            }
-        }],
-    "meta": {
-        "author": "artem savarin",
-        "license": "MIT",
-        "license-url": "https://opensource.org/licenses/MIT"
-    }
-}`))},
+				Body: bytes.NewBuffer([]byte(``))},
 		},
 	}
 
@@ -51,7 +33,7 @@ func TestCarsHandler_ReadAllCars(t *testing.T) {
 	api.AddResource(model.Car{}, resource.CarResource{Storage: mockRepo})
 
 	client := testClient{
-		baseURL: "/v1/cars",
+		baseURL: "/v1/cars/0",
 		api:     api,
 	}
 
@@ -66,19 +48,18 @@ func TestCarsHandler_ReadAllCars(t *testing.T) {
 	}
 
 	mockRepo.EXPECT().Insert(car).Return(car.ID, nil)
-	mockRepo.EXPECT().GetAll().Return([]*model.Car{car}, nil)
 
 	//insert before read
 	for _, testCase := range createCarsCases {
 		client.Do(testCase.request)
 	}
 
-	for _, testCase := range readCarsCases {
+	for _, testCase := range deleteCarsCases {
+
+		mockRepo.EXPECT().Delete("0").Return(testCase.err)
+
 		response, err := client.Do(testCase.request)
 		assert.Nil(t, err, "error must be nil")
 		assert.Equal(t, testCase.response.Code, response.Code)
-		isEqual, err := areEqualJSON(testCase.response.Body.String(), response.Body.String())
-		assert.Nil(t, err, "error must be nil")
-		assert.True(t, isEqual)
 	}
 }

@@ -18,7 +18,7 @@ import (
 var createCarsCases = []TestCase{
 	{
 		Name: "create car ok case",
-		request: testRequest{method: "POST", jsonBody: `{
+		request: testRequest{method: http.MethodPost, jsonBody: `{
   "data" : {
   	"type" : "cars" , 
      "attributes": {

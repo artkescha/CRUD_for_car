@@ -34,6 +34,7 @@ type TestCase struct {
 	Name     string
 	request  testRequest
 	response *httptest.ResponseRecorder
+	err      error
 }
 
 func areEqualJSON(s1, s2 string) (bool, error) {

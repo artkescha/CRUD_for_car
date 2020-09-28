@@ -20,6 +20,9 @@ type CarResource struct {
 func (c CarResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 	cars, err := c.Storage.GetAll()
 	if err != nil {
+		if err == storage.ErrNotFound {
+			return &Response{}, api2go.NewHTTPError(err, err.Error(), http.StatusNotFound)
+		}
 		return &Response{}, api2go.NewHTTPError(err, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -50,6 +53,11 @@ func (c CarResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder,
 	}
 	cars, err := c.Storage.GetAll()
 	if err != nil {
+
+		if err == storage.ErrNotFound {
+			return 0, &Response{}, api2go.NewHTTPError(err, err.Error(), http.StatusNotFound)
+		}
+
 		return 0, &Response{}, api2go.NewHTTPError(err, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -89,7 +97,10 @@ func (c CarResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder,
 func (c CarResource) FindOne(id string, r api2go.Request) (api2go.Responder, error) {
 	car, err := c.Storage.GetOne(id)
 	if err != nil {
-		return &Response{}, api2go.NewHTTPError(err, err.Error(), http.StatusNotFound)
+		if err == storage.ErrNotFound {
+			return &Response{}, api2go.NewHTTPError(err, err.Error(), http.StatusNotFound)
+		}
+		return &Response{}, api2go.NewHTTPError(err, err.Error(), http.StatusInternalServerError)
 	}
 	return &Response{Res: car}, nil
 }
@@ -118,6 +129,12 @@ func (c CarResource) Create(obj interface{}, r api2go.Request) (api2go.Responder
 // Delete method implements api2go.ResourceDeleter interface
 func (c CarResource) Delete(id string, r api2go.Request) (api2go.Responder, error) {
 	err := c.Storage.Delete(id)
+	if err != nil {
+		if err == storage.ErrNotFound {
+			return &Response{}, api2go.NewHTTPError(err, err.Error(), http.StatusNotFound)
+		}
+		return &Response{}, api2go.NewHTTPError(err, err.Error(), http.StatusInternalServerError)
+	}
 	return &Response{Code: http.StatusNoContent}, err
 }
 
@@ -129,5 +146,11 @@ func (c CarResource) Update(obj interface{}, r api2go.Request) (api2go.Responder
 	}
 
 	err := c.Storage.Update(car)
+	if err != nil {
+		if err == storage.ErrNotFound {
+			return &Response{}, api2go.NewHTTPError(err, err.Error(), http.StatusNotFound)
+		}
+		return &Response{}, api2go.NewHTTPError(err, err.Error(), http.StatusInternalServerError)
+	}
 	return &Response{Res: car, Code: http.StatusNoContent}, err
 }
