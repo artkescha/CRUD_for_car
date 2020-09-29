@@ -28,7 +28,7 @@ func main() {
 	api := api2go.NewAPIWithResolver("v1", &resolver.RequestURL{Port: port})
 	api.AddResource(model.Car{}, resource.CarResource{Storage: storage.NewStorage()})
 
-	log.Printf("Listening on :%s", port)
+	log.Printf("Listening on port :%s", port)
 	handler := api.Handler().(*httprouter.Router)
 
 	middleware := middlewares.AccessLogger{ZapLogger: zapLogger.Sugar()}
