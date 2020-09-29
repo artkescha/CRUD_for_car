@@ -7,7 +7,7 @@ import (
 
 type RequestURL struct {
 	r    http.Request
-	Port int
+	Port string
 }
 
 //SetRequest to implement `RequestAwareResolverInterface`
