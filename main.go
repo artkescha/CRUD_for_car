@@ -10,7 +10,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/manyminds/api2go"
 	"go.uber.org/zap"
-	"log"
 	"net/http"
 	"os"
 )
@@ -22,14 +21,18 @@ func main() {
 	port, exists := os.LookupEnv("PORT")
 	if !exists {
 		port = "81"
-		zapLogger.Info("set default port value")
+		zapLogger.Info("set default port value:", zap.String("", port))
 	}
 
 	api := api2go.NewAPIWithResolver("v1", &resolver.RequestURL{Port: port})
 	api.AddResource(model.Car{}, resource.CarResource{Storage: storage.NewStorage()})
 
-	log.Printf("Listening on port :%s", port)
-	handler := api.Handler().(*httprouter.Router)
+	zapLogger.Info("Listening on port:", zap.String("",port))
+
+	handler, ok := api.Handler().(*httprouter.Router)
+	if !ok {
+		zapLogger.Fatal("router not implemented handler interface")
+	}
 
 	middleware := middlewares.AccessLogger{ZapLogger: zapLogger.Sugar()}
 	api.UseMiddleware(middleware.AccessLogMiddleware)
