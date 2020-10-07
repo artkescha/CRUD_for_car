@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/manyminds/api2go"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -20,6 +21,12 @@ func (c testClient) Do(req testRequest) (*httptest.ResponseRecorder, error) {
 	if err != nil {
 		return &httptest.ResponseRecorder{}, err
 	}
+	defer func() {
+		err := request.Body.Close()
+		if err != nil {
+			log.Printf("close request body failed: %s", err)
+		}
+	}()
 	response := httptest.NewRecorder()
 	c.api.Handler().ServeHTTP(response, request)
 	return response, err
