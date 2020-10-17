@@ -48,7 +48,7 @@ func convertToStatus(s string) (Status, error) {
 	case "discontinued":
 		return Discontinued, nil
 	default:
-		return 0, fmt.Errorf("wrong %s status", s)
+		return 0, fmt.Errorf("wrong status")
 	}
 }
 

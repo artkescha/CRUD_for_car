@@ -111,10 +111,10 @@ func (c CarResource) Create(obj interface{}, r api2go.Request) (api2go.Responder
 	if !ok {
 		return &Response{}, api2go.NewHTTPError(fmt.Errorf("invalid instance given"), "invalid instance given", http.StatusBadRequest)
 	}
-
 	valid, err := govalidator.ValidateStruct(car)
+
 	if !valid || err != nil {
-		return &Response{}, api2go.NewHTTPError(fmt.Errorf("invalid instance given111"), "invalid instance given", http.StatusBadRequest)
+		return &Response{}, api2go.NewHTTPError(fmt.Errorf("vendor and model is required"), "vendor and model is required", http.StatusBadRequest)
 	}
 
 	id, err := c.Storage.Insert(&car)
@@ -144,8 +144,13 @@ func (c CarResource) Update(obj interface{}, r api2go.Request) (api2go.Responder
 	if !ok {
 		return &Response{}, api2go.NewHTTPError(fmt.Errorf("invalid instance given"), "invalid instance given", http.StatusBadRequest)
 	}
+	valid, err := govalidator.ValidateStruct(car)
 
-	err := c.Storage.Update(car)
+	if !valid || err != nil {
+		return &Response{}, api2go.NewHTTPError(fmt.Errorf("vendor and model is required"), "vendor and model is required", http.StatusBadRequest)
+	}
+
+	err = c.Storage.Update(car)
 	if err != nil {
 		if err == storage.ErrNotFound {
 			return &Response{}, api2go.NewHTTPError(err, err.Error(), http.StatusNotFound)
