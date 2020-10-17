@@ -15,33 +15,51 @@ const (
 	Discontinued
 )
 
-var byString = map[Status]string{
-	InTransit:    "in transit",
-	InStock:      "in stock",
-	Sold:         "sold",
-	Discontinued: "discontinued",
+func (s Status) status() (Status, error) {
+	if s >= InTransit && s <= Discontinued {
+		return s, nil
+	}
+	return 0, fmt.Errorf("status undefined")
 }
 
-var toID = func(byStrings map[Status]string) map[string]*Status {
-	byIDs := make(map[string]*Status, len(byString))
-	for key, value := range byStrings {
-		byIDs[value] = &key
-	}
-	return byIDs
-}(byString)
-
 func (s Status) String() string {
-	return byString[s]
+	switch s {
+	case InTransit:
+		return "in transit"
+	case InStock:
+		return "in stock"
+	case Sold:
+		return "sold"
+	case Discontinued:
+		return "discontinued"
+	default:
+		return fmt.Sprintf("status %d undefined", s)
+	}
+}
+
+func convertToStatus(s string) (Status, error) {
+	switch s {
+	case "in transit":
+		return InTransit, nil
+	case "in stock":
+		return InStock, nil
+	case "sold":
+		return Sold, nil
+	case "discontinued":
+		return Discontinued, nil
+	default:
+		return 0, fmt.Errorf("wrong %s status", s)
+	}
 }
 
 // MarshalJSON marshals the enum as a quoted json string
 func (s Status) MarshalJSON() ([]byte, error) {
 	buffer := bytes.NewBufferString(`"`)
-	status, ok := byString[s]
-	if !ok {
-		return []byte{}, fmt.Errorf("status %s not allowed", s)
+	status, err := s.status()
+	if err != nil {
+		return []byte{}, fmt.Errorf("status %s %s", s, err)
 	}
-	buffer.WriteString(status)
+	buffer.WriteString(status.String())
 	buffer.WriteString(`"`)
 	return buffer.Bytes(), nil
 }
@@ -54,9 +72,10 @@ func (s *Status) UnmarshalJSON(b []byte) error {
 		return err
 	}
 	// Note that if the string cannot be found then it will be set to the zero value, 'Created' in this case.
-	s, ok := toID[j]
-	if !ok {
-		return fmt.Errorf("status `%s` not allowed", j)
+	status, err := convertToStatus(string(j))
+	if err != nil {
+		return fmt.Errorf("status %s  %s", j, err)
 	}
+	*s = status
 	return nil
 }

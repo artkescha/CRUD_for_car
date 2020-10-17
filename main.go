@@ -27,7 +27,7 @@ func main() {
 	api := api2go.NewAPIWithResolver("v1", &resolver.RequestURL{Port: port})
 	api.AddResource(model.Car{}, resource.CarResource{Storage: storage.NewStorage()})
 
-	zapLogger.Info("Listening on port:", zap.String("",port))
+	zapLogger.Info("Listening on port:", zap.String("", port))
 
 	handler, ok := api.Handler().(*httprouter.Router)
 	if !ok {
