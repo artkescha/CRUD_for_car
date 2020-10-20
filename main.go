@@ -32,6 +32,7 @@ func main() {
 	handler, ok := api.Handler().(*httprouter.Router)
 	if !ok {
 		zapLogger.Fatal("router not implemented handler interface")
+		return
 	}
 
 	middleware := middlewares.AccessLogger{ZapLogger: zapLogger.Sugar()}

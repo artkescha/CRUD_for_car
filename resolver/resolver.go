@@ -21,5 +21,5 @@ func (m RequestURL) GetBaseURL() string {
 		return uri
 	}
 
-	return fmt.Sprintf("https://localhost:%d", m.Port)
+	return fmt.Sprintf("https://localhost:%s", m.Port)
 }
